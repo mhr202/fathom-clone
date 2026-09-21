@@ -73,7 +73,13 @@ function main() {
   if (event === "UserPromptSubmit") {
     const prompt = (input.prompt ?? "").toString();
     if (!prompt.trim()) return;
-    const model = input.model || cfg.model || "claude-opus-4-8";
+    // Detect the real model from the transcript rather than trusting a hardcoded
+    // value — the running model can differ from config, and the log must be honest.
+    const model =
+      input.model ||
+      latestAssistantModel(input.transcript_path) ||
+      cfg.model ||
+      "unknown";
     appendEntry(filePath, {
       type: "PROMPT",
       shortId,
@@ -98,6 +104,30 @@ function main() {
       pairWithPrompt: true,
     });
   }
+}
+
+// ---------------------------------------------------------------------------
+// Read the most recent assistant model name from a transcript (JSONL), so prompt
+// entries are stamped with the model that is actually running.
+// ---------------------------------------------------------------------------
+function latestAssistantModel(transcriptPath) {
+  if (!transcriptPath || !fs.existsSync(transcriptPath)) return "";
+  let lines;
+  try {
+    lines = fs.readFileSync(transcriptPath, "utf8").split("\n").filter(Boolean);
+  } catch {
+    return "";
+  }
+  let model = "";
+  for (const line of lines) {
+    try {
+      const e = JSON.parse(line);
+      if (e.type === "assistant" && e.message && e.message.model) {
+        model = e.message.model;
+      }
+    } catch {}
+  }
+  return model;
 }
 
 // ---------------------------------------------------------------------------
@@ -211,7 +241,7 @@ function appendEntry(filePath, entry) {
     `session_id: ${entry.sessionId}\n` +
     `date: ${firstTime.slice(0, 10)}\n` +
     `author: ${entry.cfg.author}\n` +
-    `model: ${entry.cfg.model || entry.model}\n` +
+    `model: ${entry.model || entry.cfg.model}\n` +
     `tool: claude-code\n` +
     `project: ${entry.cfg.project}\n` +
     `total_exchanges: ${totalExchanges}\n` +
