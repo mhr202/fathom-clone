@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getHighlight } from "@/lib/data";
-import { formatTimestamp } from "@/lib/types";
+import { formatTimestamp, formatFullDate } from "@/lib/types";
 import { ShareHeader } from "@/components/ShareHeader";
 import { Avatar } from "@/components/Avatar";
 import { Icon } from "@/components/icons";
@@ -32,12 +32,7 @@ export default async function SharedHighlightPage({
           {meeting.title}
         </h1>
         <p className="mt-1 text-sm text-slate-500">
-          {new Date(meeting.date).toLocaleDateString(undefined, {
-            month: "long",
-            day: "numeric",
-            year: "numeric",
-          })}{" "}
-          · {meeting.platform}
+          {formatFullDate(meeting.date)} · {meeting.platform}
         </p>
 
         {/* Highlighted moment */}

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { Meeting, formatDuration, formatTimestamp } from "@/lib/types";
+import { Meeting, formatDuration, formatTimestamp, formatFullDate } from "@/lib/types";
 import { TEMPLATES, getTemplate } from "@/lib/templates";
 import { Avatar } from "./Avatar";
 import { Icon } from "./icons";
@@ -92,12 +92,8 @@ export function MeetingDetail({ meeting }: { meeting: Meeting }) {
             {meeting.title}
           </h1>
           <p className="mt-1 text-sm text-slate-500">
-            {new Date(meeting.date).toLocaleDateString(undefined, {
-              weekday: "long",
-              month: "long",
-              day: "numeric",
-            })}{" "}
-            · {formatDuration(meeting.durationSec)} · {meeting.platform}
+            {formatFullDate(meeting.date)} · {formatDuration(meeting.durationSec)} ·{" "}
+            {meeting.platform}
           </p>
         </div>
         <button

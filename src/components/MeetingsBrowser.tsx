@@ -14,7 +14,13 @@ const sentimentStyles: Record<Meeting["sentiment"], string> = {
   tense: "bg-rose-50 text-rose-700",
 };
 
-export function MeetingsBrowser({ meetings }: { meetings: Meeting[] }) {
+export function MeetingsBrowser({
+  meetings,
+  now,
+}: {
+  meetings: Meeting[];
+  now: number;
+}) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("All");
   const [modalOpen, setModalOpen] = useState(false);
@@ -132,7 +138,7 @@ export function MeetingsBrowser({ meetings }: { meetings: Meeting[] }) {
               </div>
 
               <p className="mt-1 text-xs text-slate-400">
-                {relativeDate(m.date)} · {formatDuration(m.durationSec)} · {m.platform}
+                {relativeDate(m.date, now)} · {formatDuration(m.durationSec)} · {m.platform}
               </p>
 
               <p className="mt-3 line-clamp-2 text-sm text-slate-600">

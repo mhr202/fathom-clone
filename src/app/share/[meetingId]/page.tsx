@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getMeeting } from "@/lib/data";
-import { formatDuration } from "@/lib/types";
+import { formatDuration, formatFullDate } from "@/lib/types";
 import { ShareHeader } from "@/components/ShareHeader";
 import { Avatar } from "@/components/Avatar";
 import { Icon } from "@/components/icons";
@@ -23,12 +23,8 @@ export default async function SharedMeetingPage({
           {meeting.title}
         </h1>
         <p className="mt-1 text-sm text-slate-500">
-          {new Date(meeting.date).toLocaleDateString(undefined, {
-            month: "long",
-            day: "numeric",
-            year: "numeric",
-          })}{" "}
-          · {formatDuration(meeting.durationSec)} · {meeting.platform}
+          {formatFullDate(meeting.date)} · {formatDuration(meeting.durationSec)} ·{" "}
+          {meeting.platform}
         </p>
 
         <div className="mt-4 flex items-center gap-2">

@@ -37,7 +37,7 @@ export default function HomePage() {
 
         {/* Browser */}
         <div className="mt-8">
-          <MeetingsBrowser meetings={meetings} />
+          <MeetingsBrowser meetings={meetings} now={Date.now()} />
         </div>
       </div>
     </AppShell>

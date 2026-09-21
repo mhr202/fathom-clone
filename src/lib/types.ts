@@ -77,9 +77,10 @@ export function formatTimestamp(sec: number): string {
   return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
 }
 
-export function relativeDate(iso: string): string {
+// `now` is passed in from the server so server and client compute the same string
+// (avoids hydration mismatches from Date.now() drifting between render passes).
+export function relativeDate(iso: string, now: number): string {
   const then = new Date(iso).getTime();
-  const now = Date.now();
   const diff = Math.max(0, now - then);
   const mins = Math.floor(diff / 60000);
   if (mins < 60) return `${mins} min ago`;
@@ -88,8 +89,25 @@ export function relativeDate(iso: string): string {
   const days = Math.floor(hours / 24);
   if (days === 1) return "Yesterday";
   if (days < 7) return `${days} days ago`;
-  return new Date(iso).toLocaleDateString(undefined, {
+  return formatShortDate(iso);
+}
+
+// Absolute date formatters pinned to a fixed locale + timezone so SSR and client
+// hydration always produce identical text.
+export function formatShortDate(iso: string): string {
+  return new Date(iso).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
+    timeZone: "UTC",
+  });
+}
+
+export function formatFullDate(iso: string): string {
+  return new Date(iso).toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC",
   });
 }
