@@ -5,3 +5,6 @@ node_modules/
 .DS_Store
 *.log
 # NOTE: .agent-logs/ is intentionally NOT ignored — it ships with the repo per the 8x brief.
+
+# local GitHub token (never committed)
+.gh-token.txt
