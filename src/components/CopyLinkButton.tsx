@@ -13,12 +13,16 @@ export function CopyLinkButton() {
           setCopied(true);
           setTimeout(() => setCopied(false), 2000);
         } catch {
-          /* clipboard blocked — no-op */
+          /* clipboard unavailable */
         }
       }}
-      className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:border-brand-300 hover:text-brand-700"
+      className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs text-fog-300 ring-1 ring-ink-700 transition hover:bg-ink-850 hover:text-fog-100"
     >
-      {copied ? <Icon.Check className="h-4 w-4 text-emerald-500" /> : <Icon.Copy className="h-4 w-4" />}
+      {copied ? (
+        <Icon.Check className="h-3.5 w-3.5 text-accent" />
+      ) : (
+        <Icon.Copy className="h-3.5 w-3.5" />
+      )}
       {copied ? "Copied" : "Copy link"}
     </button>
   );

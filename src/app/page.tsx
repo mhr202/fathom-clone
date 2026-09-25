@@ -1,46 +1,46 @@
-import { AppShell } from "@/components/AppShell";
-import { MeetingsBrowser } from "@/components/MeetingsBrowser";
-import { getMeetings } from "@/lib/data";
+import { Shell } from "@/components/Shell";
+import { MeetingsList } from "@/components/MeetingsList";
+import { listMeetings, getCategories, getStats } from "@/lib/queries";
+import { toMeetingDTO } from "@/lib/dto";
 
-export default function HomePage() {
-  const meetings = getMeetings();
+export const dynamic = "force-dynamic";
 
-  const totalActionItems = meetings.reduce((n, m) => n + m.actionItems.length, 0);
-  const openActionItems = meetings.reduce(
-    (n, m) => n + m.actionItems.filter((a) => !a.done).length,
-    0
-  );
-  const totalHours = Math.round(
-    meetings.reduce((n, m) => n + m.durationSec, 0) / 3600
-  );
+export default async function HomePage() {
+  const [meetings, categories, stats] = await Promise.all([
+    listMeetings(),
+    getCategories(),
+    getStats(),
+  ]);
 
   return (
-    <AppShell active="home">
-      <div className="px-5 py-6 sm:px-8 sm:py-8">
-        {/* Header */}
-        <div className="flex flex-col gap-1">
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-            Good afternoon, Dev 👋
-          </h1>
-          <p className="text-sm text-slate-500">
-            Here&apos;s what happened across your recent meetings.
-          </p>
+    <Shell active="meetings">
+      <div className="px-5 py-7 sm:px-10">
+        <div className="flex flex-col gap-6 border-b border-ink-800 pb-7 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <h1 className="font-display text-5xl leading-none tracking-tight text-fog-50">
+              Meetings
+            </h1>
+            <p className="mt-3 max-w-md text-sm leading-relaxed text-fog-400">
+              Everything that was said, decided and promised — on one timeline.
+            </p>
+          </div>
+
+          <dl className="flex gap-8">
+            <Stat label="Recorded" value={stats.meetings} />
+            <Stat label="Hours" value={`${stats.hours}`} />
+            <Stat label="Open" value={stats.openActions} accent />
+          </dl>
         </div>
 
-        {/* Stat tiles */}
-        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <Stat label="Meetings" value={meetings.length} />
-          <Stat label="Hours captured" value={`${totalHours}h`} />
-          <Stat label="Action items" value={totalActionItems} />
-          <Stat label="Still open" value={openActionItems} accent />
-        </div>
-
-        {/* Browser */}
-        <div className="mt-8">
-          <MeetingsBrowser meetings={meetings} now={Date.now()} />
+        <div className="mt-7">
+          <MeetingsList
+            initialMeetings={meetings.map(toMeetingDTO)}
+            categories={categories}
+            now={Date.now()}
+          />
         </div>
       </div>
-    </AppShell>
+    </Shell>
   );
 }
 
@@ -54,17 +54,15 @@ function Stat({
   accent?: boolean;
 }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-4">
-      <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
-        {label}
-      </p>
-      <p
-        className={`mt-1 text-2xl font-bold ${
-          accent ? "text-brand-600" : "text-slate-900"
+    <div>
+      <dt className="text-[10px] uppercase tracking-[0.18em] text-fog-500">{label}</dt>
+      <dd
+        className={`mt-1 font-display text-3xl leading-none ${
+          accent ? "text-accent" : "text-fog-100"
         }`}
       >
         {value}
-      </p>
+      </dd>
     </div>
   );
 }

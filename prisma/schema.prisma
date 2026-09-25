@@ -1,0 +1,86 @@
+// Real relational schema backing the app — no mock data.
+// Postgres (Neon) accessed through Prisma.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Meeting {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  date        DateTime
+  durationSec Int
+  platform    String
+  category    String
+  sentiment   String
+  keywords    String[]
+  summary     String[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  participants Participant[]
+  actionItems  ActionItem[]
+  highlights   Highlight[]
+  transcript   TranscriptSegment[]
+
+  @@index([date])
+  @@index([category])
+}
+
+model Participant {
+  id        String  @id @default(cuid())
+  meetingId String
+  name      String
+  initials  String
+  role      String?
+  color     String
+
+  meeting Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+
+  @@index([meetingId])
+}
+
+model ActionItem {
+  id        String   @id @default(cuid())
+  meetingId String
+  task      String
+  owner     String
+  due       String?
+  done      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  meeting Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+
+  @@index([meetingId])
+}
+
+model Highlight {
+  id        String   @id @default(cuid())
+  meetingId String
+  timestamp Int
+  text      String
+  by        String
+  createdAt DateTime @default(now())
+
+  meeting Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+
+  @@index([meetingId])
+}
+
+model TranscriptSegment {
+  id        String @id @default(cuid())
+  meetingId String
+  speaker   String
+  start     Int
+  text      String
+
+  meeting Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+
+  @@index([meetingId, start])
+}
