@@ -8,3 +8,6 @@ node_modules/
 
 # local GitHub token (never committed)
 .gh-token.txt
+
+# build artifacts
+*.tsbuildinfo
